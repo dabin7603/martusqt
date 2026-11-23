@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#2D5A43" />
+  <rect x="36" y="36" width="440" height="440" rx="84" fill="none" stroke="#E8DFCA" stroke-width="6" stroke-opacity="0.35" />
+  <path d="M256 118v124M212 162h88" stroke="#F8F6F1" stroke-width="22" stroke-linecap="round" />
+  <text x="256" y="346" text-anchor="middle" fill="#F8F6F1" font-family="sans-serif" font-weight="800" font-size="88" letter-spacing="4">QT</text>
+  <text x="256" y="408" text-anchor="middle" fill="#D4AF37" font-family="sans-serif" font-weight="600" font-size="34" letter-spacing="3">MARTUS</text>
+</svg>
