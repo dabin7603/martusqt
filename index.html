@@ -1315,8 +1315,8 @@
                 $('qt-delete-btn').classList.remove('hidden');
                 $('qt-public-hint').classList.add('hidden');
                 $('my-entry-time').textContent = `${formatTimeHHMM(myEntry.updatedAt)} 등록`;
-                if (document.activeElement !== inputEl) {
-                    inputEl.value = myEntry.content;
+                if (document.activeElement !== inputEl && inputEl.dataset.loadedKey !== `${targetDate}_${me.id}`) {
+                    inputEl.value = "";
                     inputEl.dataset.loadedKey = `${targetDate}_${me.id}`;
                 }
             } else {
@@ -1736,6 +1736,7 @@
                     updatedAt: new Date().toISOString(),
                     amens: Array.isArray(existing?.amens) ? existing.amens : []
                 });
+                $('qt-content-input').value = '';
                 $('qt-content-input').blur();
                 showToast(existing ? "묵상이 수정되었습니다." : "큐티를 완료했습니다! 🙏");
             } catch {
