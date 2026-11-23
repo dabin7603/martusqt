@@ -8,7 +8,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="날마다 주님과 QT">
-    <meta name="theme-color" content="#2C5E4F">
+    <meta name="theme-color" content="#2C5545">
     <title>날마다 주님과 - 큐티 모임</title>
 
     <!-- Tailwind CSS -->
@@ -27,15 +27,15 @@
                         sans: ['Pretendard', '"Noto Sans KR"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
                     },
                     colors: {
-                        cream: '#FAF9F6',
+                        cream: '#F8F7F2',
                         sage: {
-                            50: '#F1F6F4',
-                            100: '#DCEAE5',
-                            200: '#B8D5CA',
-                            500: '#3D7A67',
-                            600: '#2C5E4F',
-                            700: '#234C40',
-                            800: '#1B3A31',
+                            50: '#F0F5F3',
+                            100: '#DAE7E2',
+                            200: '#B5CFC5',
+                            500: '#3D6E5C',
+                            600: '#2C5545',
+                            700: '#224437',
+                            800: '#193329',
                         },
                         warm: {
                             50: '#FDF8EE',
@@ -49,11 +49,18 @@
         }
     </script>
     <style>
-        body {
-            background-color: #EFECE6;
+        html, body {
+            background-color: #F8F7F2;
             font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
             -webkit-tap-highlight-color: transparent;
             overscroll-behavior-y: none;
+            margin: 0;
+            padding: 0;
+        }
+        @media (min-width: 640px) {
+            body {
+                background-color: #EAE7DF;
+            }
         }
         .thin-scrollbar::-webkit-scrollbar {
             height: 6px;
@@ -86,11 +93,11 @@
 </head>
 <body class="min-h-screen flex justify-center text-stone-800">
 
-    <!-- 모바일 앱 컨테이너 -->
-    <div id="app-shell" class="w-full max-w-md min-h-screen bg-cream shadow-xl relative flex flex-col overflow-x-hidden">
+    <!-- 모바일 앱 컨테이너 (모바일 전체 화면 꽉 참, 데스크톱 중앙 정렬) -->
+    <div id="app-shell" class="w-full sm:max-w-md min-h-screen bg-cream sm:shadow-xl relative flex flex-col overflow-x-hidden">
 
         <!-- 초기 로딩 화면 -->
-        <div id="loading-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-cream max-w-md mx-auto">
+        <div id="loading-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-cream sm:max-w-md mx-auto">
             <div class="w-14 h-14 rounded-2xl bg-sage-600 flex items-center justify-center text-white text-2xl shadow-md mb-4 animate-bounce">
                 📖
             </div>
@@ -98,25 +105,57 @@
             <p class="text-stone-400 text-xs mt-1">큐티 모임 데이터를 불러오는 중...</p>
         </div>
 
-        <!-- ==================== 1. 온보딩 (신규 등록 / 기존 멤버 입장) ==================== -->
-        <div id="onboarding-screen" class="hidden flex-1 flex flex-col justify-center px-6 py-10 animate-fade-in">
-            <div class="text-center mb-7">
+        <!-- ==================== 1. 온보딩 (로그인 / 신규 등록 탭 분리) ==================== -->
+        <div id="onboarding-screen" class="hidden flex-1 flex flex-col justify-center px-5 py-10 animate-fade-in">
+            <div class="text-center mb-6">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-warm-100 text-warm-700 text-xs font-bold mb-3">
                     📘 날마다 주님과 · 2026년 11-12월호
                 </span>
-                <h1 id="onboarding-group-title" class="text-2xl font-bold text-stone-800 tracking-tight">마르투스 큐티모임</h1>
+                <h1 id="onboarding-group-title" class="text-2xl font-bold text-stone-800 tracking-tight">은혜의 아침 큐티모임</h1>
                 <p class="text-stone-500 text-sm mt-2 leading-relaxed">
                     매일 말씀을 읽고 짧은 묵상을 나누며<br>서로의 큐티를 응원하는 공간입니다.
                 </p>
             </div>
 
-            <!-- 신규 등록 폼 -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200/70 mb-5">
-                <h2 class="text-base font-bold text-stone-800 mb-4 flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-sage-100 text-sage-700 text-xs flex items-center justify-center font-bold">1</span>
-                    간단 프로필 등록
-                </h2>
-                <form id="register-form" class="space-y-4">
+            <!-- 로그인 / 신규 등록 전환 카드 -->
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/70">
+                <!-- 상단 탭 스위처 -->
+                <div class="bg-stone-100 p-1 rounded-2xl grid grid-cols-2 gap-1 mb-5">
+                    <button type="button" id="auth-tab-login" onclick="setAuthTab('login')"
+                        class="py-2.5 rounded-xl text-sm font-bold bg-white text-sage-700 shadow-xs transition">
+                        로그인
+                    </button>
+                    <button type="button" id="auth-tab-register" onclick="setAuthTab('register')"
+                        class="py-2.5 rounded-xl text-sm font-semibold text-stone-500 hover:text-stone-700 transition">
+                        신규 등록
+                    </button>
+                </div>
+
+                <!-- [탭 1] 로그인 폼 -->
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-600 mb-1.5">이름 (등록한 닉네임)</label>
+                        <input type="text" id="login-name" required maxlength="15" placeholder="예: 김은혜" autocomplete="username"
+                            class="w-full px-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600 focus:bg-white transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-600 mb-1.5">개인 4자리 비밀번호</label>
+                        <input type="password" id="login-pin" required inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="숫자 4자리 입력" autocomplete="current-password"
+                            class="w-full px-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm tracking-[0.4em] focus:outline-none focus:ring-2 focus:ring-sage-600 focus:bg-white transition">
+                        <p class="text-[11px] text-stone-400 mt-1.5 leading-relaxed">
+                            * 기존에 비밀번호 없이 등록하신 분은 원하시는 숫자 4자리를 입력하시면 자동 설정 후 로그인됩니다.
+                        </p>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-3.5 rounded-xl bg-sage-600 hover:bg-sage-700 active:scale-[0.99] text-white font-bold text-sm shadow-sm transition mt-1">
+                        로그인하고 입장하기
+                    </button>
+                </form>
+
+                <!-- [탭 2] 신규 등록 폼 -->
+                <form id="register-form" class="hidden space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-stone-600 mb-1.5">이름 (모두에게 보여질 닉네임)</label>
                         <input type="text" id="reg-name" required maxlength="15" placeholder="예: 김은혜"
@@ -147,17 +186,17 @@
                             class="w-full px-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600 focus:bg-white transition">
                     </div>
 
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-600 mb-1.5">개인 4자리 비밀번호 (로그인용)</label>
+                        <input type="password" id="reg-pin" required inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="숫자 4자리 설정" autocomplete="new-password"
+                            class="w-full px-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm tracking-[0.4em] focus:outline-none focus:ring-2 focus:ring-sage-600 focus:bg-white transition">
+                    </div>
+
                     <button type="submit"
-                        class="w-full py-3.5 rounded-xl bg-sage-600 hover:bg-sage-700 active:scale-[0.99] text-white font-bold text-sm shadow-sm transition mt-2">
+                        class="w-full py-3.5 rounded-xl bg-sage-600 hover:bg-sage-700 active:scale-[0.99] text-white font-bold text-sm shadow-sm transition mt-1">
                         등록하고 큐티 시작하기
                     </button>
                 </form>
-            </div>
-
-            <!-- 기존 멤버 바로 입장 -->
-            <div id="existing-members-box" class="hidden bg-white rounded-3xl p-5 shadow-sm border border-stone-200/70">
-                <h3 class="text-xs font-bold text-stone-500 mb-3">이미 등록된 멤버로 바로 입장하기</h3>
-                <div id="existing-members-list" class="flex flex-wrap gap-2"></div>
             </div>
         </div>
 
@@ -178,14 +217,14 @@
 
                 <!-- 우측: 내 프로필 버튼 + 관리자(⚙️) 버튼 -->
                 <div class="flex items-center gap-1.5 shrink-0">
-                    <button type="button" onclick="openProfileModal()" title="내 프로필 보기/수정"
+                    <button type="button" onclick="openProfileModal()" title="내 프로필 / 로그아웃"
                         class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white hover:bg-stone-50 active:scale-95 border border-stone-200/80 text-xs font-bold text-sage-700 shadow-xs transition">
                         <span>🌿</span>
                         <span id="header-user-name" class="max-w-[72px] truncate">멤버</span>
                     </button>
-                    <button type="button" id="admin-access-btn" onclick="handleAdminButtonClick()" title="관리자 (말씀 관리)"
+                    <button type="button" id="admin-access-btn" onclick="handleAdminButtonClick()" title="관리자 메뉴"
                         class="w-9 h-9 rounded-xl bg-white hover:bg-stone-100 active:scale-95 border border-stone-200/80 flex items-center justify-center text-stone-500 shadow-xs transition">
-                        <span id="admin-btn-icon" class="text-base leading-none">⚙️</span>
+                        <span class="text-base leading-none">⚙️</span>
                     </button>
                 </div>
             </header>
@@ -194,12 +233,32 @@
             <main class="flex-1 px-4 pt-4 space-y-5">
 
                 <!-- ==================== TAB 1: 오늘의 QT ==================== -->
-                <section id="tab-today" class="space-y-5 animate-fade-in">
-                    <!-- 날짜 & 나의 완료 배지 -->
+                <section id="tab-today" class="space-y-4 animate-fade-in">
+                    <!-- 날짜 선택기 (기본: 오늘) -->
+                    <div class="bg-white rounded-2xl p-2 shadow-sm border border-stone-200/70 flex items-center justify-between gap-1">
+                        <button type="button" id="qt-prev-day" class="px-3 py-2 rounded-xl hover:bg-stone-100 active:bg-stone-200 text-stone-600 text-xs font-bold transition shrink-0">
+                            ◀ 이전
+                        </button>
+                        <div class="text-center flex-1">
+                            <label class="relative inline-flex items-center justify-center gap-1 cursor-pointer px-2 py-1 rounded-lg hover:bg-stone-50">
+                                <span id="qt-date-display" class="text-sm font-bold text-stone-800"></span>
+                                <span class="text-xs text-stone-400">📅</span>
+                                <input type="date" id="qt-date-picker" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                            </label>
+                            <div>
+                                <button type="button" id="qt-go-today" class="text-[11px] text-sage-600 font-bold hover:underline">오늘로 이동</button>
+                            </div>
+                        </div>
+                        <button type="button" id="qt-next-day" class="px-3 py-2 rounded-xl hover:bg-stone-100 active:bg-stone-200 text-stone-600 text-xs font-bold transition shrink-0">
+                            다음 ▶
+                        </button>
+                    </div>
+
+                    <!-- 나의 완료 배지 -->
                     <div class="flex items-center justify-between px-1">
-                        <span id="today-date-label" class="text-sm font-bold text-stone-700"></span>
+                        <span class="text-xs font-semibold text-stone-500">선택한 날짜의 나의 QT</span>
                         <div id="my-today-status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-warm-100 text-warm-700">
-                            ⏳ 오늘 QT 미완료
+                            ⏳ QT 미완료
                         </div>
                     </div>
 
@@ -218,11 +277,11 @@
                         <div id="passage-body" class="text-sm text-sage-50/95 leading-relaxed whitespace-pre-line bg-black/15 rounded-2xl p-4 relative z-10"></div>
                     </div>
 
-                    <!-- 나의 묵상 등록 / 수정 카드 -->
+                    <!-- 나의 묵상 등록 / 수정 / 삭제 카드 -->
                     <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/70">
                         <div class="flex items-center justify-between mb-3">
                             <h3 class="text-sm font-bold text-stone-800 flex items-center gap-1.5">
-                                <span>✍️</span> 오늘의 묵상 나누기
+                                <span>✍️</span> 묵상 나누기
                             </h3>
                             <span id="my-entry-time" class="text-[11px] text-stone-400"></span>
                         </div>
@@ -231,20 +290,24 @@
                                 placeholder="오늘 '날마다 주님과' 말씀을 통해 받은 은혜나 적용할 한 가지를 자유롭게 나누어 주세요."
                                 class="w-full p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-sage-600 focus:bg-white resize-none transition"></textarea>
                             <div class="flex items-center justify-between gap-2">
-                                <span class="text-[11px] text-stone-400">등록 시 모임원들에게 공개됩니다</span>
+                                <button type="button" id="qt-delete-btn" onclick="openDeleteEntryModal()"
+                                    class="hidden px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition shrink-0">
+                                    삭제
+                                </button>
+                                <span id="qt-public-hint" class="text-[11px] text-stone-400">등록 시 모임원들에게 공개됩니다</span>
                                 <button type="submit" id="qt-submit-btn"
-                                    class="px-5 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 active:scale-95 text-white text-sm font-bold shadow-sm transition shrink-0">
+                                    class="px-5 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 active:scale-95 text-white text-sm font-bold shadow-sm transition shrink-0 ml-auto">
                                     묵상 등록 및 완료
                                 </button>
                             </div>
                         </form>
                     </div>
 
-                    <!-- 오늘의 묵상 나눔 피드 (전체 공개) -->
+                    <!-- 묵상 나눔 피드 (전체 공개) -->
                     <div class="space-y-3">
                         <div class="flex items-center justify-between px-1">
                             <h3 class="text-sm font-bold text-stone-800">
-                                💬 오늘의 묵상 나눔 <span id="today-feed-count" class="text-sage-600 ml-1">0</span>
+                                💬 묵상 나눔 <span id="today-feed-count" class="text-sage-600 ml-1">0</span>
                             </h3>
                             <span class="text-[11px] text-stone-400">실시간 업데이트</span>
                         </div>
@@ -268,7 +331,6 @@
 
                     <!-- [뷰 A] 일별 현황 -->
                     <div id="status-daily-view" class="space-y-4">
-                        <!-- 날짜 선택기 (이전/달력/다음) -->
                         <div class="bg-white rounded-2xl p-2.5 shadow-sm border border-stone-200/70 flex items-center justify-between gap-1">
                             <button type="button" id="status-prev-day" class="px-3 py-2 rounded-xl hover:bg-stone-100 active:bg-stone-200 text-stone-600 text-xs font-bold transition shrink-0">
                                 ◀ 이전
@@ -338,7 +400,7 @@
 
                         <div class="bg-white rounded-3xl p-4 shadow-sm border border-stone-200/70">
                             <div class="flex items-center justify-between mb-3">
-                                <span class="text-xs font-bold text-stone-600">멤버별 월간 기록</span>
+                                <span class="text-xs font-bold text-stone-600">멤버별 월간 출석률 및 기록</span>
                                 <span class="text-[11px] text-stone-400">좌우 스크롤 · ✅ 클릭 시 묵상 보기</span>
                             </div>
                             <div id="monthly-grid-container" class="overflow-x-auto thin-scrollbar pb-2"></div>
@@ -346,14 +408,12 @@
                     </div>
                 </section>
 
-                <!-- ==================== 관리자 전용 뷰: 말씀 관리 및 설정 (PIN 잠금 보호) ==================== -->
+                <!-- ==================== 관리자 전용 뷰 (PIN 잠금 보호) ==================== -->
                 <section id="tab-admin" class="hidden space-y-5 animate-fade-in">
                     <!-- 관리자 상단 바 -->
                     <div class="bg-sage-800 text-white rounded-3xl p-4 shadow-md flex items-center justify-between gap-2">
                         <div>
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-bold">🔓 관리자 모드</span>
-                            </div>
+                            <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-bold">🔓 관리자 모드</span>
                             <h2 class="text-base font-bold mt-1">날마다 주님과 관리자 메뉴</h2>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
@@ -368,7 +428,7 @@
                         </div>
                     </div>
 
-                    <!-- 관리자 서브 탭 (말씀 관리 / 멤버 관리 / 설정·초기화) -->
+                    <!-- 관리자 서브 탭 -->
                     <div class="bg-stone-200/70 p-1 rounded-2xl grid grid-cols-3 gap-1">
                         <button type="button" onclick="setAdminSubTab('passages')" data-admin-subtab="passages"
                             class="admin-subtab-btn py-2.5 rounded-xl text-xs font-bold bg-white text-sage-700 shadow-xs transition">
@@ -386,80 +446,79 @@
 
                     <!-- [관리자 패널 1] 말씀 관리 -->
                     <div id="admin-panel-passages" class="space-y-5">
-                    <!-- 1. 말씀 등록 (한 달 치 일괄 등록 | 하루씩 등록) -->
-                    <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/70 space-y-4">
-                        <div class="bg-stone-100 p-1 rounded-2xl grid grid-cols-2 gap-1">
-                            <button type="button" id="btn-mode-bulk" onclick="setManageMode('bulk')"
-                                class="py-2 rounded-xl text-xs font-bold bg-white text-sage-700 shadow-xs transition">
-                                📋 한 달 치 일괄 등록
-                            </button>
-                            <button type="button" id="btn-mode-single" onclick="setManageMode('single')"
-                                class="py-2 rounded-xl text-xs font-semibold text-stone-500 transition">
-                                ✏️ 하루씩 등록/수정
-                            </button>
+                        <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/70 space-y-4">
+                            <div class="bg-stone-100 p-1 rounded-2xl grid grid-cols-2 gap-1">
+                                <button type="button" id="btn-mode-bulk" onclick="setManageMode('bulk')"
+                                    class="py-2 rounded-xl text-xs font-bold bg-white text-sage-700 shadow-xs transition">
+                                    📋 한 달 치 일괄 등록
+                                </button>
+                                <button type="button" id="btn-mode-single" onclick="setManageMode('single')"
+                                    class="py-2 rounded-xl text-xs font-semibold text-stone-500 transition">
+                                    ✏️ 하루씩 등록/수정
+                                </button>
+                            </div>
+
+                            <!-- 일괄 등록 -->
+                            <div id="manage-mode-bulk" class="space-y-3">
+                                <div class="text-xs text-stone-500 leading-relaxed">
+                                    <strong>‘날마다 주님과’ (2026년 11·12월호)</strong> 목차를 한 줄에 하루씩 붙여넣으세요.<br>
+                                    <code class="text-[11px] bg-stone-100 text-sage-800 font-semibold px-2 py-0.5 rounded mt-1 inline-block">YYYY-MM-DD | 성경본문 | 제목 | 내용(선택)</code>
+                                </div>
+                                <textarea id="bulk-passages-input" rows="5"
+                                    placeholder="2026-11-23 | 시편 23:1-6 | 여호와는 나의 목자&#10;2026-11-24 | 잠언 3:5-6 | 마음을 다하여 신뢰하라"
+                                    class="w-full p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-xs font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-sage-600 focus:bg-white transition"></textarea>
+                                <button type="button" id="bulk-passages-save-btn"
+                                    class="w-full py-3 rounded-xl bg-sage-600 hover:bg-sage-700 active:scale-[0.99] text-white text-sm font-bold shadow-sm transition">
+                                    일괄 등록하기
+                                </button>
+                            </div>
+
+                            <!-- 하루씩 등록 -->
+                            <form id="single-passage-form" class="hidden space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-stone-600 mb-1">날짜</label>
+                                    <input type="date" id="sp-date" required
+                                        class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-stone-600 mb-1">성경 본문 범위</label>
+                                    <input type="text" id="sp-ref" required placeholder="예: 시편 23:1-6"
+                                        class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-stone-600 mb-1">큐티 제목</label>
+                                    <input type="text" id="sp-title" required placeholder="예: 여호와는 나의 목자"
+                                        class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-stone-600 mb-1">말씀 본문 / 메모 <span class="text-stone-400 font-normal">(선택 사항)</span></label>
+                                    <textarea id="sp-body" rows="3" placeholder="책이 있다면 비워두셔도 괜찮습니다."
+                                        class="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-sage-600"></textarea>
+                                </div>
+                                <button type="submit"
+                                    class="w-full py-3 rounded-xl bg-sage-600 hover:bg-sage-700 active:scale-[0.99] text-white text-sm font-bold shadow-sm transition">
+                                    말씀 저장하기
+                                </button>
+                            </form>
                         </div>
 
-                        <!-- Mode A: 일괄 등록 -->
-                        <div id="manage-mode-bulk" class="space-y-3">
-                            <div class="text-xs text-stone-500 leading-relaxed">
-                                <strong>‘날마다 주님과’ (2026년 11·12월호)</strong> 목차를 한 줄에 하루씩 붙여넣으세요. (본문 내용은 생략 가능)<br>
-                                <code class="text-[11px] bg-stone-100 text-sage-800 font-semibold px-2 py-0.5 rounded mt-1 inline-block">YYYY-MM-DD | 성경본문 | 제목 | 내용(선택)</code>
+                        <!-- 등록된 말씀 목록 -->
+                        <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/70 space-y-3">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <h3 class="text-sm font-bold text-stone-800">
+                                    📚 등록된 말씀 (<span id="passage-filtered-count">0</span>)
+                                </h3>
+                                <div class="flex gap-1">
+                                    <button type="button" onclick="setPassageFilter('2026-11')" data-pfilter="2026-11" class="pfilter-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sage-600 text-white transition">11월</button>
+                                    <button type="button" onclick="setPassageFilter('2026-12')" data-pfilter="2026-12" class="pfilter-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-600 transition">12월</button>
+                                    <button type="button" onclick="setPassageFilter('all')" data-pfilter="all" class="pfilter-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-600 transition">전체</button>
+                                </div>
                             </div>
-                            <textarea id="bulk-passages-input" rows="6"
-                                placeholder="2026-11-23 | 시편 23:1-6 | 여호와는 나의 목자&#10;2026-11-24 | 잠언 3:5-6 | 마음을 다하여 신뢰하라 | 너는 마음을 다하여 여호와를 신뢰하고...&#10;2026-12-01 | 이사야 40:1-11 | 내 백성을 위로하라"
-                                class="w-full p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-xs font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-sage-600 focus:bg-white transition"></textarea>
-                            <button type="button" id="bulk-passages-save-btn"
-                                class="w-full py-3 rounded-xl bg-sage-600 hover:bg-sage-700 active:scale-[0.99] text-white text-sm font-bold shadow-sm transition">
-                                일괄 등록하기
-                            </button>
+                            <div id="admin-passage-list" class="max-h-64 overflow-y-auto thin-scrollbar space-y-2 pr-1"></div>
                         </div>
-
-                        <!-- Mode B: 하루씩 등록 -->
-                        <form id="single-passage-form" class="hidden space-y-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-stone-600 mb-1">날짜</label>
-                                <input type="date" id="sp-date" required
-                                    class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-stone-600 mb-1">성경 본문 범위</label>
-                                <input type="text" id="sp-ref" required placeholder="예: 시편 23:1-6"
-                                    class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-stone-600 mb-1">큐티 제목</label>
-                                <input type="text" id="sp-title" required placeholder="예: 여호와는 나의 목자"
-                                    class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-stone-600 mb-1">말씀 본문 / 메모 <span class="text-stone-400 font-normal">(선택 사항)</span></label>
-                                <textarea id="sp-body" rows="3" placeholder="책이 있다면 비워두셔도 괜찮습니다."
-                                    class="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-sage-600"></textarea>
-                            </div>
-                            <button type="submit"
-                                class="w-full py-3 rounded-xl bg-sage-600 hover:bg-sage-700 active:scale-[0.99] text-white text-sm font-bold shadow-sm transition">
-                                말씀 저장하기
-                            </button>
-                        </form>
                     </div>
 
-                    <!-- 2. 등록된 말씀 목록 -->
-                    <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/70 space-y-3">
-                        <div class="flex items-center justify-between flex-wrap gap-2">
-                            <h3 class="text-sm font-bold text-stone-800">
-                                📚 등록된 말씀 (<span id="passage-filtered-count">0</span>)
-                            </h3>
-                            <div class="flex gap-1">
-                                <button type="button" onclick="setPassageFilter('2026-11')" data-pfilter="2026-11" class="pfilter-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sage-600 text-white transition">11월</button>
-                                <button type="button" onclick="setPassageFilter('2026-12')" data-pfilter="2026-12" class="pfilter-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-600 transition">12월</button>
-                                <button type="button" onclick="setPassageFilter('all')" data-pfilter="all" class="pfilter-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-600 transition">전체</button>
-                            </div>
-                        </div>
-                        <div id="admin-passage-list" class="max-h-64 overflow-y-auto thin-scrollbar space-y-2 pr-1"></div>
-                    </div>
-                    </div>
-
-                    <!-- [관리자 패널 2] 멤버 관리 (등록된 사용자 조회 및 제거) -->
+                    <!-- [관리자 패널 2] 멤버 관리 (비밀번호 재설정 및 제거) -->
                     <div id="admin-panel-members" class="hidden space-y-4">
                         <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/70 space-y-3">
                             <div class="flex items-center justify-between">
@@ -471,7 +530,7 @@
                                 </span>
                             </div>
                             <p class="text-xs text-stone-500 leading-relaxed">
-                                모임에서 나간 멤버를 제거할 수 있습니다. 제거 시 해당 멤버의 프로필과 작성한 모든 큐티 묵상 기록이 함께 삭제됩니다.
+                                비밀번호를 잊어버린 멤버의 <strong>4자리 비밀번호를 변경/초기화</strong>하거나, 모임에서 나간 멤버를 제거할 수 있습니다.
                             </p>
                             <div id="admin-member-list" class="space-y-2.5 pt-1"></div>
                         </div>
@@ -479,67 +538,66 @@
 
                     <!-- [관리자 패널 3] 설정 및 초기화 -->
                     <div id="admin-panel-settings" class="hidden space-y-5">
-                    <!-- 3. 관리자 설정 (모임 이름 / 비밀번호 변경) -->
-                    <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/70 space-y-4">
-                        <h3 class="text-sm font-bold text-stone-800 flex items-center gap-1.5">
-                            <span>⚙️</span> 관리자 설정
-                        </h3>
-
-                        <!-- 모임 이름 변경 -->
-                        <form id="group-name-form" class="space-y-1.5">
-                            <label class="block text-xs font-semibold text-stone-600">모임 이름</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="setting-group-name" required placeholder="모임 이름"
-                                    class="flex-1 px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600">
-                                <button type="submit" class="px-4 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold shrink-0 transition">
-                                    저장
-                                </button>
-                            </div>
-                        </form>
-
-                        <!-- 관리자 4자리 비밀번호 변경 -->
-                        <form id="admin-pin-change-form" class="space-y-2 pt-3 border-t border-stone-100">
-                            <label class="block text-xs font-semibold text-stone-600">관리자 비밀번호 변경 (숫자 4자리)</label>
-                            <div class="flex gap-2">
-                                <input type="password" id="new-admin-pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required placeholder="새 숫자 4자리 (현재 기본 0000)"
-                                    class="flex-1 px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-sage-600">
-                                <button type="submit" class="px-4 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-bold shrink-0 transition">
-                                    변경
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- 4. 데이터 초기화 (위험 구역) -->
-                    <div class="bg-rose-50/70 rounded-3xl p-5 border border-rose-200/80 space-y-3">
-                        <div>
-                            <h3 class="text-sm font-bold text-rose-800 flex items-center gap-1.5">
-                                <span>🗑️</span> 데이터 초기화
+                        <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/70 space-y-4">
+                            <h3 class="text-sm font-bold text-stone-800 flex items-center gap-1.5">
+                                <span>⚙️</span> 관리자 설정
                             </h3>
-                            <p class="text-xs text-rose-700/80 mt-1 leading-relaxed">
-                                모임원들에게 공유하기 전, 테스트로 쌓인 기록을 깨끗하게 비울 때 사용하세요. 삭제된 데이터는 복구할 수 없습니다.
-                            </p>
+
+                            <!-- 모임 이름 변경 -->
+                            <form id="group-name-form" class="space-y-1.5">
+                                <label class="block text-xs font-semibold text-stone-600">모임 이름 (앱 상단에 즉시 반영)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="setting-group-name" required placeholder="모임 이름"
+                                        class="flex-1 px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600">
+                                    <button type="submit" class="px-4 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold shrink-0 transition">
+                                        저장
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- 관리자 4자리 비밀번호 변경 -->
+                            <form id="admin-pin-change-form" class="space-y-2 pt-3 border-t border-stone-100">
+                                <label class="block text-xs font-semibold text-stone-600">관리자 비밀번호 변경 (숫자 4자리)</label>
+                                <div class="flex gap-2">
+                                    <input type="password" id="new-admin-pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required placeholder="새 숫자 4자리 (기본 0000)"
+                                        class="flex-1 px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-sage-600">
+                                    <button type="submit" class="px-4 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-bold shrink-0 transition">
+                                        변경
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="space-y-2 pt-1">
-                            <button type="button" onclick="openResetConfirmModal('members_entries')"
-                                class="w-full py-3 px-4 rounded-xl bg-white hover:bg-rose-50 border border-rose-300 text-rose-700 text-xs font-bold transition text-left flex items-center justify-between">
-                                <span>회원 및 묵상 기록만 초기화 <span class="font-normal text-rose-500">(등록한 말씀 유지)</span></span>
-                                <span>→</span>
-                            </button>
-                            <button type="button" onclick="openResetConfirmModal('all')"
-                                class="w-full py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition text-left flex items-center justify-between shadow-xs">
-                                <span>전체 데이터 초기화 <span class="font-normal text-rose-100">(회원·묵상·말씀 모두 삭제)</span></span>
-                                <span>→</span>
-                            </button>
+
+                        <!-- 데이터 초기화 -->
+                        <div class="bg-rose-50/70 rounded-3xl p-5 border border-rose-200/80 space-y-3">
+                            <div>
+                                <h3 class="text-sm font-bold text-rose-800 flex items-center gap-1.5">
+                                    <span>🗑️</span> 데이터 초기화
+                                </h3>
+                                <p class="text-xs text-rose-700/80 mt-1 leading-relaxed">
+                                    삭제된 데이터는 복구할 수 없습니다. 신중하게 선택해 주세요.
+                                </p>
+                            </div>
+                            <div class="space-y-2 pt-1">
+                                <button type="button" onclick="openResetConfirmModal('members_entries')"
+                                    class="w-full py-3 px-4 rounded-xl bg-white hover:bg-rose-50 border border-rose-300 text-rose-700 text-xs font-bold transition text-left flex items-center justify-between">
+                                    <span>회원 및 묵상 기록만 초기화 <span class="font-normal text-rose-500">(말씀 유지)</span></span>
+                                    <span>→</span>
+                                </button>
+                                <button type="button" onclick="openResetConfirmModal('all')"
+                                    class="w-full py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition text-left flex items-center justify-between shadow-xs">
+                                    <span>전체 데이터 초기화 <span class="font-normal text-rose-100">(회원·묵상·말씀 모두 삭제)</span></span>
+                                    <span>→</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </section>
 
             </main>
 
-            <!-- 하단 고정 네비게이션 바 (일반 멤버용 깔끔한 2탭) -->
-            <nav id="bottom-nav" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-stone-200/80 px-4 py-2 z-40">
+            <!-- 하단 고정 네비게이션 바 -->
+            <nav id="bottom-nav" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full sm:max-w-md bg-white/95 backdrop-blur-md border-t border-stone-200/80 px-4 py-2 z-40">
                 <div class="grid grid-cols-2 gap-3">
                     <button type="button" onclick="switchTab('today')" data-tab="today"
                         class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl text-sage-700 bg-sage-50 transition">
@@ -575,7 +633,7 @@
             </div>
         </div>
 
-        <!-- ==================== 모달 2: 내 프로필 수정 / 계정 전환 ==================== -->
+        <!-- ==================== 모달 2: 내 프로필 수정 / 비밀번호 변경 / 로그아웃 ==================== -->
         <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-4">
             <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-fade-in space-y-4">
                 <div class="flex items-center justify-between">
@@ -604,6 +662,11 @@
                                 class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-600">
                         </div>
                     </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-600 mb-1">개인 4자리 비밀번호 변경 <span class="text-stone-400 font-normal">(변경 시에만 입력)</span></label>
+                        <input type="password" id="edit-pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="새 숫자 4자리"
+                            class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-sage-600">
+                    </div>
                     <button type="submit"
                         class="w-full py-3 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-sm font-bold transition">
                         프로필 저장
@@ -611,9 +674,9 @@
                 </form>
 
                 <div class="pt-3 border-t border-stone-100">
-                    <button type="button" id="switch-account-btn"
+                    <button type="button" id="logout-btn"
                         class="w-full py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition">
-                        🔄 다른 멤버로 전환 / 새 멤버 추가
+                        🚪 로그아웃
                     </button>
                 </div>
             </div>
@@ -628,10 +691,9 @@
                 </div>
                 <div class="text-center mb-4">
                     <h4 class="text-base font-bold text-stone-800">관리자 비밀번호 입력</h4>
-                    <p id="pin-error-msg" class="text-xs text-stone-400 mt-1">말씀 관리를 위한 4자리 숫자를 입력하세요</p>
+                    <p id="pin-error-msg" class="text-xs text-stone-400 mt-1">관리자용 4자리 숫자를 입력하세요</p>
                 </div>
 
-                <!-- 4자리 인디케이터 -->
                 <div id="pin-dots" class="flex justify-center gap-3.5 mb-5">
                     <div class="w-3.5 h-3.5 rounded-full border-2 border-stone-300 transition-all"></div>
                     <div class="w-3.5 h-3.5 rounded-full border-2 border-stone-300 transition-all"></div>
@@ -639,13 +701,11 @@
                     <div class="w-3.5 h-3.5 rounded-full border-2 border-stone-300 transition-all"></div>
                 </div>
 
-                <!-- 이 기기에서 잠금 해제 유지 옵션 -->
                 <label class="flex items-center justify-center gap-2 text-xs text-stone-600 mb-4 cursor-pointer select-none">
                     <input type="checkbox" id="pin-keep-unlocked" checked class="w-4 h-4 accent-sage-600 rounded">
                     <span>이 기기에서 관리자 인증 유지</span>
                 </label>
 
-                <!-- 숫자 키패드 -->
                 <div class="grid grid-cols-3 gap-2">
                     <button type="button" onclick="pressPinKey('1')" class="py-3 rounded-2xl bg-stone-50 hover:bg-stone-100 active:bg-sage-100 text-lg font-bold text-stone-800 transition">1</button>
                     <button type="button" onclick="pressPinKey('2')" class="py-3 rounded-2xl bg-stone-50 hover:bg-stone-100 active:bg-sage-100 text-lg font-bold text-stone-800 transition">2</button>
@@ -663,48 +723,80 @@
             </div>
         </div>
 
-        <!-- ==================== 모달 4: 데이터 초기화 확인 모달 ==================== -->
+        <!-- ==================== 모달 4: 멤버 비밀번호 재설정 (관리자용) ==================== -->
+        <div id="member-pin-modal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl animate-fade-in space-y-4">
+                <div class="flex items-center justify-between">
+                    <h4 id="member-pin-modal-title" class="text-base font-bold text-stone-800">비밀번호 변경</h4>
+                    <button type="button" onclick="closeModal('member-pin-modal')" class="w-8 h-8 rounded-full bg-stone-100 text-stone-500 flex items-center justify-center font-bold">✕</button>
+                </div>
+                <form id="admin-member-pin-form" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-600 mb-1.5">새 4자리 비밀번호</label>
+                        <input type="text" id="admin-member-new-pin" required inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="숫자 4자리 입력 (예: 1234)"
+                            class="w-full px-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm tracking-widest text-center font-bold focus:outline-none focus:ring-2 focus:ring-sage-600">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button type="button" onclick="resetMemberPinEmpty()"
+                            class="py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition">
+                            비우기 (재설정 유도)
+                        </button>
+                        <button type="submit"
+                            class="py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-bold transition">
+                            저장하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== 모달 5: 본인 묵상 삭제 확인 ==================== -->
+        <div id="delete-entry-modal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl animate-fade-in space-y-4">
+                <div class="text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-3">🗑️</div>
+                    <h4 class="text-base font-bold text-stone-800">묵상 글을 삭제할까요?</h4>
+                    <p class="text-xs text-stone-500 mt-1.5">삭제하면 해당 날짜의 큐티 완료 상태도 미완료로 변경됩니다.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="closeModal('delete-entry-modal')"
+                        class="py-3 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition">취소</button>
+                    <button type="button" id="confirm-delete-entry-btn"
+                        class="py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">삭제하기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 모달 6: 데이터 초기화 확인 ==================== -->
         <div id="reset-confirm-modal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl animate-fade-in space-y-4">
                 <div class="text-center">
-                    <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-3">
-                        ⚠️
-                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-3">⚠️</div>
                     <h4 id="reset-modal-title" class="text-base font-bold text-stone-800">데이터를 초기화할까요?</h4>
                     <p id="reset-modal-desc" class="text-xs text-stone-500 mt-1.5 leading-relaxed"></p>
                 </div>
                 <div class="grid grid-cols-2 gap-2 pt-1">
                     <button type="button" onclick="closeModal('reset-confirm-modal')"
-                        class="py-3 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition">
-                        취소
-                    </button>
+                        class="py-3 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition">취소</button>
                     <button type="button" id="confirm-reset-exec-btn"
-                        class="py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">
-                        네, 초기화합니다
-                    </button>
+                        class="py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">네, 초기화합니다</button>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== 모달 5: 멤버 제거 확인 모달 ==================== -->
+        <!-- ==================== 모달 7: 멤버 제거 확인 ==================== -->
         <div id="delete-member-modal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl animate-fade-in space-y-4">
                 <div class="text-center">
-                    <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-3">
-                        👤
-                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-3">👤</div>
                     <h4 id="delete-member-modal-title" class="text-base font-bold text-stone-800">멤버를 제거할까요?</h4>
                     <p id="delete-member-modal-desc" class="text-xs text-stone-500 mt-1.5 leading-relaxed"></p>
                 </div>
                 <div class="grid grid-cols-2 gap-2 pt-1">
                     <button type="button" onclick="closeModal('delete-member-modal')"
-                        class="py-3 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition">
-                        취소
-                    </button>
+                        class="py-3 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition">취소</button>
                     <button type="button" id="confirm-delete-member-btn"
-                        class="py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">
-                        네, 제거합니다
-                    </button>
+                        class="py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">네, 제거합니다</button>
                 </div>
             </div>
         </div>
@@ -721,9 +813,9 @@
         import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, collection, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ------------------------------------------------------------
-        // 1. Firebase 설정 (martusqt 프로젝트 연동 완료)
+        // 1. Firebase 설정 (martusqt 프로젝트 연동)
         // ------------------------------------------------------------
-        const EXTERNAL_FIREBASE_CONFIG = {
+        const firebaseConfig = {
             apiKey: "AIzaSyDVIGDACah3qrOYtcrMqo61RYdaAtQLkqc",
             authDomain: "martusqt.firebaseapp.com",
             projectId: "martusqt",
@@ -734,28 +826,32 @@
         };
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'martusqt-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined'
-            ? JSON.parse(__firebase_config)
-            : EXTERNAL_FIREBASE_CONFIG;
+        const SESSION_KEY = 'martusqt_member_id';
+        const ADMIN_SESSION_KEY = 'martusqt_admin_unlocked';
 
         let app, auth, db;
         let authUser = null;
-        let pendingResetScope = null; // 'members_entries' | 'all'
+        let pendingResetScope = null;
         let pendingDeleteMemberId = null;
+        let pendingPinMemberId = null;
         let isResettingData = false;
         let pinBuffer = '';
 
         const nowObj = new Date();
+        const todayInitial = getLocalDateString(nowObj);
+
         const state = {
             currentMemberId: null,
             isAdminUnlocked: false,
+            authTab: 'login', // 'login' | 'register'
             currentTab: 'today', // 'today' | 'status' | 'admin'
             adminSubTab: 'passages', // 'passages' | 'members' | 'settings'
             statusViewMode: 'daily', // 'daily' | 'monthly'
-            selectedStatusDate: getLocalDateString(nowObj),
+            selectedQtDate: todayInitial,
+            selectedStatusDate: todayInitial,
             selectedYear: nowObj.getFullYear(),
             selectedMonth: nowObj.getMonth() + 1,
-            manageMode: 'bulk', // 'bulk' | 'single'
+            manageMode: 'bulk',
             passageFilter: `${nowObj.getFullYear()}-${String(nowObj.getMonth() + 1).padStart(2, '0')}`,
             settings: {
                 groupName: '은혜의 아침 큐티모임',
@@ -767,7 +863,20 @@
         };
 
         // ------------------------------------------------------------
-        // 2. 날짜 & 공통 유틸리티
+        // 2. 세션 저장 헬퍼 (localStorage 안전 래퍼 + Firestore 동기화)
+        // ------------------------------------------------------------
+        function getSavedSession(key) {
+            try { return window.localStorage.getItem(key); } catch (e) { return null; }
+        }
+        function setSavedSession(key, val) {
+            try {
+                if (val === null || val === undefined) window.localStorage.removeItem(key);
+                else window.localStorage.setItem(key, String(val));
+            } catch (e) {}
+        }
+
+        // ------------------------------------------------------------
+        // 3. 날짜 & 공통 유틸리티
         // ------------------------------------------------------------
         function getLocalDateString(dateObj) {
             const y = dateObj.getFullYear();
@@ -832,16 +941,36 @@
         }
 
         // ------------------------------------------------------------
-        // 3. Firestore 경로 헬퍼 (Strict Path Rule 준수)
+        // 4. Firestore 경로 헬퍼
         // ------------------------------------------------------------
         const publicCol = (name) => collection(db, 'artifacts', appId, 'public', 'data', name);
         const publicDoc = (name, id) => doc(db, 'artifacts', appId, 'public', 'data', name, id);
         const userSessionDoc = (uid) => doc(db, 'artifacts', appId, 'users', uid, 'session', 'active');
 
         // ------------------------------------------------------------
-        // 4. 네비게이션 및 모달 제어
+        // 5. 탭 & 모달 제어
         // ------------------------------------------------------------
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+
+        window.setAuthTab = function(tab) {
+            state.authTab = tab;
+            const loginBtn = document.getElementById('auth-tab-login');
+            const regBtn = document.getElementById('auth-tab-register');
+            const loginForm = document.getElementById('login-form');
+            const regForm = document.getElementById('register-form');
+
+            if (tab === 'login') {
+                loginBtn.className = 'py-2.5 rounded-xl text-sm font-bold bg-white text-sage-700 shadow-xs transition';
+                regBtn.className = 'py-2.5 rounded-xl text-sm font-semibold text-stone-500 hover:text-stone-700 transition';
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+            } else {
+                regBtn.className = 'py-2.5 rounded-xl text-sm font-bold bg-white text-sage-700 shadow-xs transition';
+                loginBtn.className = 'py-2.5 rounded-xl text-sm font-semibold text-stone-500 hover:text-stone-700 transition';
+                regForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            }
+        };
 
         window.switchTab = function(tabName) {
             state.currentTab = tabName;
@@ -849,7 +978,6 @@
                 document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
             });
 
-            // 하단 2개 탭 활성화 표시
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 const isActive = btn.dataset.tab === tabName;
                 btn.className = isActive
@@ -858,7 +986,6 @@
                 btn.querySelector('span:last-child').className = isActive ? 'text-[11px] font-bold' : 'text-[11px] font-semibold';
             });
 
-            // 관리자 버튼 강조 표시
             const adminBtn = document.getElementById('admin-access-btn');
             adminBtn.className = tabName === 'admin'
                 ? 'w-9 h-9 rounded-xl bg-sage-600 text-white border border-sage-700 flex items-center justify-center shadow-xs transition'
@@ -935,7 +1062,7 @@
         };
 
         // ------------------------------------------------------------
-        // 5. 관리자 PIN 인증 로직 (기본값: 0000)
+        // 6. 관리자 PIN 인증 (기본값: 0000)
         // ------------------------------------------------------------
         window.handleAdminButtonClick = function() {
             if (state.currentTab === 'admin') {
@@ -948,7 +1075,7 @@
             }
             pinBuffer = '';
             updatePinDots();
-            document.getElementById('pin-error-msg').textContent = '말씀 관리를 위한 4자리 숫자를 입력하세요';
+            document.getElementById('pin-error-msg').textContent = '관리자용 4자리 숫자를 입력하세요';
             document.getElementById('pin-error-msg').className = 'text-xs text-stone-400 mt-1';
             document.getElementById('pin-modal').classList.remove('hidden');
         };
@@ -972,15 +1099,12 @@
                 if (pinBuffer === correctPin) {
                     state.isAdminUnlocked = true;
                     const keepUnlocked = document.getElementById('pin-keep-unlocked').checked;
+                    setSavedSession(ADMIN_SESSION_KEY, keepUnlocked ? '1' : null);
                     if (authUser) {
-                        try {
-                            await setDoc(userSessionDoc(authUser.uid), {
-                                adminUnlocked: keepUnlocked,
-                                updatedAt: new Date().toISOString()
-                            }, { merge: true });
-                        } catch (e) {
-                            console.warn("관리자 세션 저장 실패:", e);
-                        }
+                        setDoc(userSessionDoc(authUser.uid), {
+                            adminUnlocked: keepUnlocked,
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true }).catch(() => {});
                     }
                     window.closeModal('pin-modal');
                     window.switchTab('admin');
@@ -989,7 +1113,7 @@
                     const dotsWrap = document.getElementById('pin-dots');
                     const errEl = document.getElementById('pin-error-msg');
                     dotsWrap.classList.add('animate-shake');
-                    errEl.textContent = '비밀번호가 일치하지 않습니다. 다시 시도해 주세요.';
+                    errEl.textContent = '비밀번호가 일치하지 않습니다.';
                     errEl.className = 'text-xs text-rose-600 font-semibold mt-1';
                     setTimeout(() => {
                         dotsWrap.classList.remove('animate-shake');
@@ -1012,22 +1136,19 @@
 
         window.lockAdminMode = async function() {
             state.isAdminUnlocked = false;
+            setSavedSession(ADMIN_SESSION_KEY, null);
             if (authUser) {
-                try {
-                    await setDoc(userSessionDoc(authUser.uid), {
-                        adminUnlocked: false,
-                        updatedAt: new Date().toISOString()
-                    }, { merge: true });
-                } catch (e) {
-                    console.warn("관리자 잠금 저장 실패:", e);
-                }
+                setDoc(userSessionDoc(authUser.uid), {
+                    adminUnlocked: false,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true }).catch(() => {});
             }
             window.switchTab('today');
             showToast("관리자 모드를 잠갔습니다.", "info");
         };
 
         // ------------------------------------------------------------
-        // 6. 프로필 모달 & 데이터 초기화 모달
+        // 7. 모달 액션 (프로필 / 묵상 삭제 / 멤버 비밀번호 변경 / 초기화)
         // ------------------------------------------------------------
         window.openProfileModal = function() {
             const me = getCurrentMember();
@@ -1035,7 +1156,70 @@
             document.getElementById('edit-name').value = me.name || '';
             document.getElementById('edit-gender').value = me.gender || '남';
             document.getElementById('edit-birth').value = me.birthDate || '';
+            document.getElementById('edit-pin').value = '';
             document.getElementById('profile-modal').classList.remove('hidden');
+        };
+
+        window.openDeleteEntryModal = function() {
+            document.getElementById('delete-entry-modal').classList.remove('hidden');
+        };
+
+        document.getElementById('confirm-delete-entry-btn').addEventListener('click', async () => {
+            if (!authUser || !state.currentMemberId) return;
+            const entryId = `${state.selectedQtDate}_${state.currentMemberId}`;
+            try {
+                await deleteDoc(publicDoc('qt_entries', entryId));
+                document.getElementById('qt-content-input').value = '';
+                window.closeModal('delete-entry-modal');
+                showToast("묵상 글이 삭제되었습니다.", "info");
+            } catch (err) {
+                console.error(err);
+                showToast("삭제 중 오류가 발생했습니다.", "error");
+            }
+        });
+
+        // 관리자: 멤버 비밀번호 변경 모달
+        window.openMemberPinModal = function(memberId) {
+            const member = state.members.find(m => m.id === memberId);
+            if (!member) return;
+            pendingPinMemberId = memberId;
+            document.getElementById('member-pin-modal-title').textContent = `${member.name}님 비밀번호 변경`;
+            document.getElementById('admin-member-new-pin').value = '';
+            document.getElementById('member-pin-modal').classList.remove('hidden');
+        };
+
+        document.getElementById('admin-member-pin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!authUser || !pendingPinMemberId) return;
+            const newPin = document.getElementById('admin-member-new-pin').value.trim();
+            if (!/^\d{4}$/.test(newPin)) {
+                showToast("비밀번호는 숫자 4자리로 입력해 주세요.", "error");
+                return;
+            }
+            try {
+                await updateDoc(publicDoc('members', pendingPinMemberId), { pin: newPin });
+                window.closeModal('member-pin-modal');
+                showToast("멤버의 4자리 비밀번호가 변경되었습니다.");
+            } catch (err) {
+                console.error(err);
+                showToast("비밀번호 변경에 실패했습니다.", "error");
+            } finally {
+                pendingPinMemberId = null;
+            }
+        });
+
+        window.resetMemberPinEmpty = async function() {
+            if (!authUser || !pendingPinMemberId) return;
+            try {
+                await updateDoc(publicDoc('members', pendingPinMemberId), { pin: '' });
+                window.closeModal('member-pin-modal');
+                showToast("비밀번호가 초기화되었습니다. 다음 로그인 시 새로 설정됩니다.", "info");
+            } catch (err) {
+                console.error(err);
+                showToast("초기화에 실패했습니다.", "error");
+            } finally {
+                pendingPinMemberId = null;
+            }
         };
 
         window.openResetConfirmModal = function(scope) {
@@ -1045,10 +1229,10 @@
 
             if (scope === 'all') {
                 titleEl.textContent = '전체 데이터를 초기화할까요?';
-                descEl.textContent = '등록된 모든 회원, 묵상 기록, 그리고 큐티 말씀이 영구적으로 삭제됩니다.';
+                descEl.textContent = '등록된 모든 회원, 묵상 기록, 큐티 말씀이 영구적으로 삭제됩니다.';
             } else {
                 titleEl.textContent = '회원 및 묵상 기록만 초기화할까요?';
-                descEl.textContent = '테스트 회원과 묵상 기록이 모두 삭제됩니다. 미리 등록해 두신 큐티 말씀은 그대로 유지됩니다.';
+                descEl.textContent = '회원과 묵상 기록이 모두 삭제되며, 등록해 두신 큐티 말씀은 유지됩니다.';
             }
             document.getElementById('reset-confirm-modal').classList.remove('hidden');
         };
@@ -1079,26 +1263,27 @@
                     await deleteCollectionDocs('qt_passages');
                 }
 
-                // 현재 기기의 로그인 멤버 세션도 비우고 온보딩으로 이동 (관리자 인증 유지 여부는 초기화)
                 state.currentMemberId = null;
+                state.isAdminUnlocked = false;
+                setSavedSession(SESSION_KEY, null);
+                setSavedSession(ADMIN_SESSION_KEY, null);
                 await setDoc(userSessionDoc(authUser.uid), {
                     memberId: null,
                     adminUnlocked: false,
                     updatedAt: new Date().toISOString()
                 });
-                state.isAdminUnlocked = false;
 
                 window.closeModal('reset-confirm-modal');
                 window.switchTab('today');
                 updateScreenVisibility();
                 showToast(
                     pendingResetScope === 'all'
-                        ? '전체 데이터가 깨끗하게 초기화되었습니다.'
+                        ? '전체 데이터가 초기화되었습니다.'
                         : '회원 및 묵상 기록이 초기화되었습니다. (말씀 유지)'
                 );
             } catch (err) {
                 console.error("초기화 오류:", err);
-                showToast("데이터 초기화 중 오류가 발생했습니다.", "error");
+                showToast("초기화 중 오류가 발생했습니다.", "error");
             } finally {
                 btn.disabled = false;
                 btn.textContent = origText;
@@ -1107,7 +1292,6 @@
             }
         });
 
-        // 멤버 제거 확인 모달 열기
         window.openDeleteMemberModal = function(memberId) {
             const member = state.members.find(m => m.id === memberId);
             if (!member) return;
@@ -1117,11 +1301,10 @@
 
             document.getElementById('delete-member-modal-title').textContent = `${member.name}님을 제거할까요?`;
             document.getElementById('delete-member-modal-desc').textContent =
-                `제거 시 ${member.name}님의 프로필과 작성한 모든 큐티 묵상 기록(${entryCount}건)이 영구적으로 삭제됩니다.${isSelf ? ' (현재 로그인된 본인 계정이므로 삭제 후 등록 화면으로 이동합니다.)' : ''}`;
+                `제거 시 ${member.name}님의 프로필과 모든 묵상 기록(${entryCount}건)이 영구적으로 삭제됩니다.${isSelf ? ' (본인 계정이므로 삭제 후 로그인 화면으로 이동합니다.)' : ''}`;
             document.getElementById('delete-member-modal').classList.remove('hidden');
         };
 
-        // 멤버 및 해당 멤버의 모든 묵상 기록 일괄 삭제
         document.getElementById('confirm-delete-member-btn').addEventListener('click', async () => {
             if (!authUser || !pendingDeleteMemberId) return;
             const targetId = pendingDeleteMemberId;
@@ -1146,9 +1329,9 @@
                     await batch.commit();
                 }
 
-                // 본인 계정을 삭제한 경우 세션 정리
                 if (state.currentMemberId === targetId) {
                     state.currentMemberId = null;
+                    setSavedSession(SESSION_KEY, null);
                     await setDoc(userSessionDoc(authUser.uid), {
                         memberId: null,
                         updatedAt: new Date().toISOString()
@@ -1168,24 +1351,18 @@
         });
 
         // ------------------------------------------------------------
-        // 7. Firebase 초기화 및 실시간 구독 (Auth Before Queries)
+        // 8. Firebase 초기화 및 실시간 구독
         // ------------------------------------------------------------
         async function initApp() {
-            if (!firebaseConfig) {
-                document.getElementById('loading-screen').innerHTML = `
-                    <div class="px-6 text-center space-y-2">
-                        <p class="text-2xl">🔧</p>
-                        <p class="text-rose-600 font-bold text-sm">Firebase 설정이 필요합니다</p>
-                        <p class="text-stone-500 text-xs leading-relaxed">외부 호스팅에 배포하신 경우, 코드 상단의<br><code>EXTERNAL_FIREBASE_CONFIG</code>에 본인 Firebase 설정을 입력해 주세요.</p>
-                    </div>
-                `;
-                return;
-            }
-
             try {
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
+
+                // 로컬 스토리지 세션 우선 복원
+                const localMemberId = getSavedSession(SESSION_KEY);
+                if (localMemberId) state.currentMemberId = localMemberId;
+                if (getSavedSession(ADMIN_SESSION_KEY) === '1') state.isAdminUnlocked = true;
 
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
@@ -1201,7 +1378,10 @@
                         const sessSnap = await getDoc(userSessionDoc(user.uid));
                         if (sessSnap.exists()) {
                             const data = sessSnap.data();
-                            if (data.memberId) state.currentMemberId = data.memberId;
+                            if (!state.currentMemberId && data.memberId) {
+                                state.currentMemberId = data.memberId;
+                                setSavedSession(SESSION_KEY, data.memberId);
+                            }
                             if (data.adminUnlocked) state.isAdminUnlocked = true;
                         }
                     } catch (e) {
@@ -1229,7 +1409,7 @@
         function subscribeFirestoreData() {
             if (!authUser) return;
 
-            // 1. 모임 설정 (이름 & 관리자 PIN)
+            // 1. 모임 설정
             onSnapshot(publicDoc('settings', 'group_config'), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
@@ -1238,7 +1418,10 @@
                 }
                 loadedFlags.settings = true;
                 checkInitialLoadComplete();
-                if (document.getElementById('loading-screen').classList.contains('hidden')) renderCurrentView();
+                if (document.getElementById('loading-screen').classList.contains('hidden')) {
+                    updateScreenVisibility();
+                    renderCurrentView();
+                }
             }, (err) => console.error("settings 구독 오류:", err));
 
             // 2. 멤버 목록
@@ -1246,9 +1429,9 @@
                 state.members = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 state.members.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ko'));
 
-                // 현재 로그인된 멤버가 관리자에 의해 삭제된 경우 실시간 감지 후 등록 화면으로 복귀
                 if (state.currentMemberId && !state.members.some(m => m.id === state.currentMemberId)) {
                     state.currentMemberId = null;
+                    setSavedSession(SESSION_KEY, null);
                     if (authUser) {
                         setDoc(userSessionDoc(authUser.uid), {
                             memberId: null,
@@ -1256,7 +1439,7 @@
                         }, { merge: true }).catch(() => {});
                     }
                     if (loadedFlags.members && !isResettingData) {
-                        showToast("등록된 프로필이 삭제되어 초기 화면으로 이동했습니다.", "info");
+                        showToast("등록된 프로필이 삭제되어 로그인 화면으로 이동했습니다.", "info");
                     }
                 }
 
@@ -1292,6 +1475,7 @@
             const onboarding = document.getElementById('onboarding-screen');
             const mainApp = document.getElementById('main-app');
             document.getElementById('onboarding-group-title').textContent = state.settings.groupName;
+            document.title = `${state.settings.groupName} - 날마다 주님과`;
 
             if (state.currentMemberId) {
                 onboarding.classList.add('hidden');
@@ -1299,47 +1483,11 @@
             } else {
                 onboarding.classList.remove('hidden');
                 mainApp.classList.add('hidden');
-                renderExistingMembersOnboarding();
             }
         }
-
-        function renderExistingMembersOnboarding() {
-            const box = document.getElementById('existing-members-box');
-            const list = document.getElementById('existing-members-list');
-            if (state.members.length === 0) {
-                box.classList.add('hidden');
-                return;
-            }
-            box.classList.remove('hidden');
-            list.innerHTML = state.members.map(m => `
-                <button type="button" onclick="selectExistingMember('${m.id}')"
-                    class="px-3.5 py-2 rounded-xl bg-sage-50 hover:bg-sage-100 border border-sage-200 text-sage-800 text-xs font-bold transition flex items-center gap-1.5">
-                    <span>${m.gender === '여' ? '👩' : '👨'}</span>
-                    <span>${escapeHTML(m.name)}</span>
-                </button>
-            `).join('');
-        }
-
-        window.selectExistingMember = async function(memberId) {
-            if (!authUser) return;
-            try {
-                state.currentMemberId = memberId;
-                await setDoc(userSessionDoc(authUser.uid), {
-                    memberId,
-                    updatedAt: new Date().toISOString()
-                }, { merge: true });
-                updateScreenVisibility();
-                renderCurrentView();
-                const member = state.members.find(m => m.id === memberId);
-                showToast(`${member ? member.name : ''}님, 반갑습니다!`);
-            } catch (err) {
-                console.error(err);
-                showToast("입장 처리 중 오류가 발생했습니다.", "error");
-            }
-        };
 
         // ------------------------------------------------------------
-        // 8. 화면 렌더링
+        // 9. 화면 렌더링
         // ------------------------------------------------------------
         function getCurrentMember() {
             return state.members.find(m => m.id === state.currentMemberId) || null;
@@ -1359,12 +1507,16 @@
             else if (state.currentTab === 'admin') renderAdminTab();
         }
 
-        // [TAB 1] 오늘의 QT
+        // [TAB 1] 오늘의 QT (날짜 선택 지원)
         function renderTodayTab(me) {
+            const targetDate = state.selectedQtDate;
             const todayStr = getLocalDateString(new Date());
-            document.getElementById('today-date-label').textContent = formatKoreanDate(todayStr);
 
-            const passage = state.passages[todayStr];
+            document.getElementById('qt-date-display').textContent = formatKoreanDate(targetDate);
+            document.getElementById('qt-date-picker').value = targetDate;
+            document.getElementById('qt-go-today').classList.toggle('invisible', targetDate === todayStr);
+
+            const passage = state.passages[targetDate];
             const titleEl = document.getElementById('passage-title');
             const refEl = document.getElementById('passage-ref');
             const bodyEl = document.getElementById('passage-body');
@@ -1374,56 +1526,65 @@
                 refEl.textContent = passage.reference;
                 bodyEl.textContent = passage.body && passage.body.trim()
                     ? passage.body
-                    : "📘 '날마다 주님과' 책의 오늘 본문을 읽고, 마음속에 와닿은 은혜를 아래에 자유롭게 나누어 주세요.";
+                    : "📘 '날마다 주님과' 책의 본문을 읽고, 마음속에 와닿은 은혜를 아래에 자유롭게 나누어 주세요.";
             } else {
-                titleEl.textContent = "오늘의 큐티 말씀이 아직 등록되지 않았어요";
-                refEl.textContent = formatShortKoreanDate(todayStr);
-                bodyEl.textContent = "📘 '날마다 주님과' 오늘 날짜의 말씀을 읽고 묵상을 나누어 주세요. (관리자가 말씀을 등록하면 이곳에 자동으로 표시됩니다.)";
+                titleEl.textContent = "이 날짜의 큐티 말씀이 아직 등록되지 않았어요";
+                refEl.textContent = formatShortKoreanDate(targetDate);
+                bodyEl.textContent = "📘 '날마다 주님과' 해당 날짜의 말씀을 읽고 묵상을 나누어 주세요.";
             }
 
-            const myEntry = state.entries.find(e => e.date === todayStr && e.memberId === me.id);
+            const myEntry = state.entries.find(e => e.date === targetDate && e.memberId === me.id);
             const statusBadge = document.getElementById('my-today-status-badge');
             const submitBtn = document.getElementById('qt-submit-btn');
+            const deleteBtn = document.getElementById('qt-delete-btn');
+            const publicHint = document.getElementById('qt-public-hint');
             const timeEl = document.getElementById('my-entry-time');
             const inputEl = document.getElementById('qt-content-input');
 
             if (myEntry) {
                 statusBadge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800";
-                statusBadge.textContent = "✅ 오늘 QT 완료";
+                statusBadge.textContent = "✅ QT 완료";
                 submitBtn.textContent = "묵상 수정하기";
+                deleteBtn.classList.remove('hidden');
+                publicHint.classList.add('hidden');
                 timeEl.textContent = `${formatTimeHHMM(myEntry.updatedAt)} 등록됨`;
-                if (document.activeElement !== inputEl) inputEl.value = myEntry.content;
+                if (document.activeElement !== inputEl) {
+                    inputEl.value = myEntry.content;
+                    inputEl.dataset.loadedKey = `${targetDate}_${me.id}`;
+                }
             } else {
                 statusBadge.className = "px-3 py-1 rounded-full text-xs font-bold bg-warm-100 text-warm-700";
-                statusBadge.textContent = "⏳ 오늘 QT 미완료";
+                statusBadge.textContent = "⏳ QT 미완료";
                 submitBtn.textContent = "묵상 등록 및 완료";
+                deleteBtn.classList.add('hidden');
+                publicHint.classList.remove('hidden');
                 timeEl.textContent = "";
-                if (document.activeElement !== inputEl && inputEl.dataset.lastDate !== todayStr) {
+                if (document.activeElement !== inputEl && inputEl.dataset.loadedKey !== `${targetDate}_${me.id}_empty`) {
                     inputEl.value = "";
-                    inputEl.dataset.lastDate = todayStr;
+                    inputEl.dataset.loadedKey = `${targetDate}_${me.id}_empty`;
                 }
             }
 
-            // 오늘의 묵상 나눔 피드
-            const todayEntries = state.entries
-                .filter(e => e.date === todayStr)
+            // 해당 날짜의 전체 묵상 피드
+            const dateEntries = state.entries
+                .filter(e => e.date === targetDate)
                 .sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
 
-            document.getElementById('today-feed-count').textContent = todayEntries.length;
+            document.getElementById('today-feed-count').textContent = dateEntries.length;
             const feedList = document.getElementById('today-feed-list');
 
-            if (todayEntries.length === 0) {
+            if (dateEntries.length === 0) {
                 feedList.innerHTML = `
                     <div class="bg-white rounded-3xl p-8 text-center border border-dashed border-stone-300">
                         <p class="text-2xl mb-2">🌱</p>
-                        <p class="text-sm font-semibold text-stone-600">아직 오늘 등록된 묵상이 없습니다</p>
-                        <p class="text-xs text-stone-400 mt-1">첫 번째로 오늘의 은혜를 나누어 보세요!</p>
+                        <p class="text-sm font-semibold text-stone-600">아직 등록된 묵상이 없습니다</p>
+                        <p class="text-xs text-stone-400 mt-1">첫 번째로 은혜를 나누어 보세요!</p>
                     </div>
                 `;
                 return;
             }
 
-            feedList.innerHTML = todayEntries.map(entry => {
+            feedList.innerHTML = dateEntries.map(entry => {
                 const author = state.members.find(m => m.id === entry.memberId);
                 const authorName = author ? author.name : '알 수 없음';
                 const amens = Array.isArray(entry.amens) ? entry.amens : [];
@@ -1611,14 +1772,15 @@
                     }
                 }
 
+                const rate = Math.round((completedCount / daysInMonth) * 100);
                 return `
                     <tr class="border-t border-stone-100 hover:bg-stone-50/60">
                         <td class="sticky left-0 z-10 bg-white pr-2.5 py-2.5 text-xs font-bold text-stone-800 whitespace-nowrap border-r border-stone-100">
                             ${escapeHTML(member.name)}
                         </td>
                         ${dayCells}
-                        <td class="sticky right-0 z-10 bg-white pl-2.5 py-2.5 text-center text-xs font-bold text-sage-700 whitespace-nowrap border-l border-stone-100">
-                            ${completedCount}일
+                        <td class="sticky right-0 z-10 bg-white pl-2.5 py-2.5 text-center text-[11px] font-bold text-sage-700 whitespace-nowrap border-l border-stone-100">
+                            ${completedCount}일 <span class="text-stone-400 font-normal">(${rate}%)</span>
                         </td>
                     </tr>
                 `;
@@ -1630,7 +1792,7 @@
                         <tr class="border-b border-stone-200">
                             <th class="sticky left-0 z-20 bg-white pr-2.5 py-2 text-left text-[11px] font-bold text-stone-500 whitespace-nowrap border-r border-stone-100">이름</th>
                             ${headerCells}
-                            <th class="sticky right-0 z-20 bg-white pl-2.5 py-2 text-center text-[11px] font-bold text-sage-700 whitespace-nowrap border-l border-stone-100">합계</th>
+                            <th class="sticky right-0 z-20 bg-white pl-2.5 py-2 text-center text-[11px] font-bold text-sage-700 whitespace-nowrap border-l border-stone-100">출석</th>
                         </tr>
                     </thead>
                     <tbody>${bodyRows}</tbody>
@@ -1651,9 +1813,8 @@
             document.getElementById('qt-detail-modal').classList.remove('hidden');
         };
 
-        // [관리자 뷰] 렌더링
+        // [관리자 뷰]
         function renderAdminTab() {
-            // 관리자 서브 탭 버튼 & 패널 전환
             document.querySelectorAll('.admin-subtab-btn').forEach(btn => {
                 const active = btn.dataset.adminSubtab === state.adminSubTab;
                 btn.className = active
@@ -1667,13 +1828,6 @@
 
             const gNameInput = document.getElementById('setting-group-name');
             if (document.activeElement !== gNameInput) gNameInput.value = state.settings.groupName;
-
-            document.querySelectorAll('.pfilter-btn').forEach(btn => {
-                const active = btn.dataset.pfilter === state.passageFilter;
-                btn.className = active
-                    ? 'pfilter-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sage-600 text-white transition'
-                    : 'pfilter-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-stone-100 text-stone-600 transition';
-            });
 
             renderAdminPassageList();
             renderAdminMemberList();
@@ -1691,7 +1845,6 @@
                 return;
             }
 
-            // 멤버별 작성 묵상 수 집계
             const entryCountMap = {};
             state.entries.forEach(e => {
                 entryCountMap[e.memberId] = (entryCountMap[e.memberId] || 0) + 1;
@@ -1700,27 +1853,39 @@
             listEl.innerHTML = state.members.map(member => {
                 const count = entryCountMap[member.id] || 0;
                 const isMe = member.id === state.currentMemberId;
+                const hasPin = Boolean(member.pin && String(member.pin).length === 4);
                 return `
-                    <div class="p-3.5 rounded-2xl bg-stone-50 border border-stone-200/70 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <div class="w-10 h-10 rounded-2xl ${isMe ? 'bg-sage-600 text-white' : 'bg-sage-100 text-sage-800'} font-bold flex items-center justify-center text-sm shrink-0">
-                                ${escapeHTML((member.name || '?').charAt(0))}
-                            </div>
-                            <div class="min-w-0">
-                                <div class="flex items-center gap-1.5 flex-wrap">
-                                    <span class="text-sm font-bold text-stone-800 truncate">${escapeHTML(member.name)}</span>
-                                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-stone-200/80 text-stone-600 font-semibold">${escapeHTML(member.gender || '-')}</span>
-                                    ${isMe ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-sage-100 text-sage-700 font-bold">나</span>' : ''}
+                    <div class="p-3.5 rounded-2xl bg-stone-50 border border-stone-200/70 space-y-2.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-2xl ${isMe ? 'bg-sage-600 text-white' : 'bg-sage-100 text-sage-800'} font-bold flex items-center justify-center text-sm shrink-0">
+                                    ${escapeHTML((member.name || '?').charAt(0))}
                                 </div>
-                                <p class="text-[11px] text-stone-500 mt-0.5">
-                                    생년월일 ${escapeHTML(member.birthDate || '-')} · <span class="text-sage-700 font-semibold">묵상 ${count}회</span>
-                                </p>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="text-sm font-bold text-stone-800 truncate">${escapeHTML(member.name)}</span>
+                                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-stone-200/80 text-stone-600 font-semibold">${escapeHTML(member.gender || '-')}</span>
+                                        ${isMe ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-sage-100 text-sage-700 font-bold">나</span>' : ''}
+                                        <span class="text-[10px] px-1.5 py-0.5 rounded ${hasPin ? 'bg-emerald-50 text-emerald-700' : 'bg-warm-100 text-warm-700'} font-semibold">
+                                            ${hasPin ? '🔑 PIN 설정됨' : '⚠️ PIN 미설정'}
+                                        </span>
+                                    </div>
+                                    <p class="text-[11px] text-stone-500 mt-0.5">
+                                        생년월일 ${escapeHTML(member.birthDate || '-')} · <span class="text-sage-700 font-semibold">묵상 ${count}회</span>
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                        <button type="button" onclick="openDeleteMemberModal('${member.id}')"
-                            class="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 active:scale-95 border border-rose-200 text-rose-600 text-xs font-bold shrink-0 transition">
-                            제거
-                        </button>
+                        <div class="flex items-center justify-end gap-1.5 pt-1 border-t border-stone-200/60">
+                            <button type="button" onclick="openMemberPinModal('${member.id}')"
+                                class="px-3 py-1.5 rounded-xl bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-xs font-bold transition">
+                                🔑 비밀번호 변경
+                            </button>
+                            <button type="button" onclick="openDeleteMemberModal('${member.id}')"
+                                class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 text-xs font-bold transition">
+                                제거
+                            </button>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1783,10 +1948,59 @@
         };
 
         // ------------------------------------------------------------
-        // 9. 이벤트 리스너
+        // 10. 이벤트 리스너 (로그인 / 신규 등록 / QT / 현황판 / 관리자)
         // ------------------------------------------------------------
 
-        // 신규 멤버 등록
+        // [로그인] 이름 + 개인 4자리 비밀번호
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!authUser) return;
+
+            const name = document.getElementById('login-name').value.trim();
+            const pin = document.getElementById('login-pin').value.trim();
+
+            if (!name || !/^\d{4}$/.test(pin)) {
+                showToast("이름과 숫자 4자리 비밀번호를 입력해 주세요.", "error");
+                return;
+            }
+
+            const member = state.members.find(m => (m.name || '').trim() === name);
+            if (!member) {
+                showToast("등록되지 않은 이름입니다. '신규 등록' 탭을 이용해 주세요.", "error");
+                return;
+            }
+
+            try {
+                // 기존 비밀번호 미설정 멤버인 경우 자동 설정 후 로그인
+                if (!member.pin) {
+                    await updateDoc(publicDoc('members', member.id), { pin });
+                    showToast(`${member.name}님의 비밀번호가 설정되었습니다. 환영합니다!`);
+                } else if (String(member.pin) !== pin) {
+                    showToast("비밀번호가 일치하지 않습니다. 다시 확인해 주세요.", "error");
+                    document.getElementById('login-pin').value = '';
+                    document.getElementById('login-pin').focus();
+                    return;
+                } else {
+                    showToast(`${member.name}님, 반갑습니다!`);
+                }
+
+                state.currentMemberId = member.id;
+                setSavedSession(SESSION_KEY, member.id);
+                await setDoc(userSessionDoc(authUser.uid), {
+                    memberId: member.id,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+
+                e.target.reset();
+                updateScreenVisibility();
+                renderCurrentView();
+            } catch (err) {
+                console.error(err);
+                showToast("로그인 처리 중 오류가 발생했습니다.", "error");
+            }
+        });
+
+        // [신규 등록] 이름 + 성별 + 생년월일 + 개인 4자리 비밀번호
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!authUser) return;
@@ -1794,18 +2008,31 @@
             const name = document.getElementById('reg-name').value.trim();
             const gender = document.querySelector('input[name="reg-gender"]:checked').value;
             const birthDate = document.getElementById('reg-birth').value;
-            if (!name || !birthDate) return;
+            const pin = document.getElementById('reg-pin').value.trim();
+
+            if (!name || !birthDate || !/^\d{4}$/.test(pin)) {
+                showToast("모든 항목과 숫자 4자리 비밀번호를 정확히 입력해 주세요.", "error");
+                return;
+            }
+
+            // 중복 이름 체크
+            if (state.members.some(m => (m.name || '').trim() === name)) {
+                showToast("이미 등록된 이름입니다. '로그인' 탭에서 입장해 주세요.", "error");
+                return;
+            }
 
             const newId = `m_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
             try {
                 await setDoc(publicDoc('members', newId), {
-                    name, gender, birthDate, createdAt: new Date().toISOString()
+                    name, gender, birthDate, pin, createdAt: new Date().toISOString()
                 });
                 state.currentMemberId = newId;
+                setSavedSession(SESSION_KEY, newId);
                 await setDoc(userSessionDoc(authUser.uid), {
                     memberId: newId,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
+
                 e.target.reset();
                 updateScreenVisibility();
                 renderCurrentView();
@@ -1816,7 +2043,27 @@
             }
         });
 
-        // 오늘의 묵상 등록/수정
+        // 오늘의 QT 날짜 제어
+        document.getElementById('qt-prev-day').addEventListener('click', () => {
+            state.selectedQtDate = addDays(state.selectedQtDate, -1);
+            renderCurrentView();
+        });
+        document.getElementById('qt-next-day').addEventListener('click', () => {
+            state.selectedQtDate = addDays(state.selectedQtDate, 1);
+            renderCurrentView();
+        });
+        document.getElementById('qt-date-picker').addEventListener('change', (e) => {
+            if (e.target.value) {
+                state.selectedQtDate = e.target.value;
+                renderCurrentView();
+            }
+        });
+        document.getElementById('qt-go-today').addEventListener('click', () => {
+            state.selectedQtDate = getLocalDateString(new Date());
+            renderCurrentView();
+        });
+
+        // 묵상 등록/수정
         document.getElementById('qt-submit-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!authUser || !state.currentMemberId) return;
@@ -1824,20 +2071,20 @@
             const content = document.getElementById('qt-content-input').value.trim();
             if (!content) return;
 
-            const todayStr = getLocalDateString(new Date());
-            const entryId = `${todayStr}_${state.currentMemberId}`;
+            const targetDate = state.selectedQtDate;
+            const entryId = `${targetDate}_${state.currentMemberId}`;
             const existing = state.entries.find(en => en.id === entryId);
 
             try {
                 await setDoc(publicDoc('qt_entries', entryId), {
-                    date: todayStr,
+                    date: targetDate,
                     memberId: state.currentMemberId,
                     content,
                     updatedAt: new Date().toISOString(),
                     amens: existing && Array.isArray(existing.amens) ? existing.amens : []
                 });
                 document.getElementById('qt-content-input').blur();
-                showToast(existing ? "오늘의 묵상이 수정되었습니다." : "오늘 큐티를 완료했습니다! 🙏");
+                showToast(existing ? "묵상이 수정되었습니다." : "큐티를 완료했습니다! 🙏");
             } catch (err) {
                 console.error(err);
                 showToast("묵상 저장에 실패했습니다.", "error");
@@ -1884,7 +2131,7 @@
             renderMonthlyGrid();
         });
 
-        // 한 달 치 말씀 일괄 등록
+        // 말씀 일괄 등록
         document.getElementById('bulk-passages-save-btn').addEventListener('click', async () => {
             if (!authUser) return;
             const raw = document.getElementById('bulk-passages-input').value.trim();
@@ -1979,7 +2226,7 @@
             }
         });
 
-        // 내 프로필 수정
+        // 내 프로필 수정 (이름 중복 체크 + 선택적 비밀번호 변경)
         document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!authUser || !state.currentMemberId) return;
@@ -1987,9 +2234,24 @@
             const name = document.getElementById('edit-name').value.trim();
             const gender = document.getElementById('edit-gender').value;
             const birthDate = document.getElementById('edit-birth').value;
+            const newPin = document.getElementById('edit-pin').value.trim();
+
+            if (state.members.some(m => m.id !== state.currentMemberId && (m.name || '').trim() === name)) {
+                showToast("이미 다른 멤버가 사용 중인 이름입니다.", "error");
+                return;
+            }
+
+            const updateData = { name, gender, birthDate };
+            if (newPin) {
+                if (!/^\d{4}$/.test(newPin)) {
+                    showToast("새 비밀번호는 숫자 4자리로 입력해 주세요.", "error");
+                    return;
+                }
+                updateData.pin = newPin;
+            }
 
             try {
-                await updateDoc(publicDoc('members', state.currentMemberId), { name, gender, birthDate });
+                await updateDoc(publicDoc('members', state.currentMemberId), updateData);
                 window.closeModal('profile-modal');
                 showToast("프로필이 수정되었습니다.");
             } catch (err) {
@@ -1998,24 +2260,26 @@
             }
         });
 
-        // 다른 멤버로 전환
-        document.getElementById('switch-account-btn').addEventListener('click', async () => {
+        // 로그아웃
+        document.getElementById('logout-btn').addEventListener('click', async () => {
             if (!authUser) return;
             try {
                 state.currentMemberId = null;
+                setSavedSession(SESSION_KEY, null);
                 await setDoc(userSessionDoc(authUser.uid), {
                     memberId: null,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
                 window.closeModal('profile-modal');
+                window.setAuthTab('login');
                 updateScreenVisibility();
-                showToast("멤버 선택 화면으로 이동했습니다.", "info");
+                showToast("로그아웃되었습니다.", "info");
             } catch (err) {
                 console.error(err);
             }
         });
 
-        // 키보드로 PIN 입력 지원
+        // 키보드로 관리자 PIN 입력 지원
         window.addEventListener('keydown', (e) => {
             const pinModal = document.getElementById('pin-modal');
             if (pinModal.classList.contains('hidden')) return;
@@ -2028,4 +2292,4 @@
         window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
-</html>
+                        </html>
