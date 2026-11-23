@@ -1867,54 +1867,37 @@
 <button id="pwa-install-btn" style="display:none; position:fixed; bottom:84px; left:50%; transform:translateX(-50%); z-index:9999; background:#2D5A43; color:#fff; border:none; border-radius:999px; padding:12px 22px; font-size:14px; font-weight:700; box-shadow:0 6px 20px rgba(0,0,0,0.22); cursor:pointer;">
   📲 마르투스QT 앱으로 설치하기
 </button>
-    <script>
-      // 서비스 워커 등록
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+  }
+
+  let deferredPrompt = null;
+  const installBtn = document.getElementById('pwa-install-btn');
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  if (!isStandalone && installBtn) {
+    installBtn.style.display = 'block';
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    installBtn.onclick = async function () {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') installBtn.style.display = 'none';
+        deferredPrompt = null;
+      } else if (isIos) {
+        alert('아이폰 앱 설치 방법:\n1. 사파리(Safari) 하단 공유 버튼(⬆️) 클릭\n2. [홈 화면에 추가] 선택\n3. 오른쪽 위 [추가] 클릭!');
+      } else {
+        alert('안드로이드 앱 설치 방법:\n1. 크롬 우측 상단 점 3개(⋮) 클릭\n2. [홈 화면에 추가] 또는 [앱 설치] 선택!');
       }
-    
-      // 아이폰 홈화면용 PNG 아이콘 자동 생성
-      (function() {
-        const c = document.createElement('canvas');
-        c.width = 180; c.height = 180;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#2D5A43'; ctx.fillRect(0, 0, 180, 180);
-        ctx.strokeStyle = '#F8F6F1'; ctx.lineWidth = 8; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(90, 38); ctx.lineTo(90, 82); ctx.moveTo(74, 54); ctx.lineTo(106, 54); ctx.stroke();
-        ctx.fillStyle = '#F8F6F1'; ctx.font = 'bold 34px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText('QT', 90, 126);
-        ctx.fillStyle = '#D4AF37'; ctx.font = 'bold 14px sans-serif';
-        ctx.fillText('MARTUS', 90, 150);
-        const link = document.createElement('link');
-        link.rel = 'apple-touch-icon'; link.href = c.toDataURL('image/png');
-        document.head.appendChild(link);
-      })();
-    
-      // 안드로이드 / 아이폰 앱 설치 버튼 동작
-      let deferredPrompt;
-      const installBtn = document.getElementById('pwa-install-btn');
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-      const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    
-      if (!isStandalone) {
-        window.addEventListener('beforeinstallprompt', (e) => {
-          e.preventDefault();
-          deferredPrompt = e;
-          installBtn.style.display = 'block';
-        });
-        installBtn.style.display = 'block';
-    
-        installBtn.addEventListener('click', async () => {
-          if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') installBtn.style.display = 'none';
-            deferredPrompt = null;
-          } else if (isIos) {
-            alert('아이폰 앱 설치 방법:\n1. 사파리(Safari) 하단 공유 버튼(⬆️) 클릭\n2. [홈 화면에 추가] 선택\n3. 오른쪽 위 [추가] 클릭!');
-          }
-        });
-      }
-    </script>
+    };
+  }
+</script>
 </body>
 </html>
